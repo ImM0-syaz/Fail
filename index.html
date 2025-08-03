@@ -1,0 +1,2230 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Fail Dokumen PDF</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #87CEEB;
+            --secondary-blue: #B0E0E6;
+            --accent-blue: #4682B4;
+            --glass-bg: rgba(135, 206, 235, 0.1);
+            --glass-border: rgba(135, 206, 235, 0.2);
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 25%, #87CEEB 50%, #B0E0E6 75%, #E0F6FF 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Floating particles background */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(135, 206, 235, 0.4) 50%, transparent 100%);
+            border-radius: 50%;
+            animation: float 8s ease-in-out infinite;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .particle:nth-child(1) { width: 8px; height: 8px; left: 10%; animation-delay: 0s; }
+        .particle:nth-child(2) { width: 12px; height: 12px; left: 20%; animation-delay: 1s; }
+        .particle:nth-child(3) { width: 6px; height: 6px; left: 30%; animation-delay: 2s; }
+        .particle:nth-child(4) { width: 10px; height: 10px; left: 40%; animation-delay: 0.5s; }
+        .particle:nth-child(5) { width: 8px; height: 8px; left: 50%; animation-delay: 1.5s; }
+        .particle:nth-child(6) { width: 14px; height: 14px; left: 60%; animation-delay: 2.5s; }
+        .particle:nth-child(7) { width: 6px; height: 6px; left: 70%; animation-delay: 3s; }
+        .particle:nth-child(8) { width: 10px; height: 10px; left: 80%; animation-delay: 0.8s; }
+        .particle:nth-child(9) { width: 8px; height: 8px; left: 90%; animation-delay: 1.8s; }
+        .particle:nth-child(10) { width: 12px; height: 12px; left: 15%; animation-delay: 2.8s; }
+
+        /* Additional floating orbs */
+        .particle:nth-child(11) { width: 20px; height: 20px; left: 5%; animation-delay: 4s; background: radial-gradient(circle, rgba(135, 206, 235, 0.6) 0%, rgba(176, 224, 230, 0.3) 50%, transparent 100%); }
+        .particle:nth-child(12) { width: 16px; height: 16px; left: 85%; animation-delay: 5s; background: radial-gradient(circle, rgba(176, 224, 230, 0.7) 0%, rgba(135, 206, 235, 0.3) 50%, transparent 100%); }
+        .particle:nth-child(13) { width: 18px; height: 18px; left: 45%; animation-delay: 6s; background: radial-gradient(circle, rgba(255, 255, 255, 0.5) 0%, rgba(135, 206, 235, 0.2) 50%, transparent 100%); }
+
+        @keyframes float {
+            0%, 100% { 
+                transform: translateY(100vh) rotate(0deg) scale(0.5); 
+                opacity: 0; 
+            }
+            10% { 
+                opacity: 1; 
+                transform: translateY(90vh) rotate(36deg) scale(0.8);
+            }
+            50% { 
+                opacity: 0.8; 
+                transform: translateY(50vh) rotate(180deg) scale(1.2);
+            }
+            90% { 
+                opacity: 1; 
+                transform: translateY(10vh) rotate(324deg) scale(0.9);
+            }
+            100% { 
+                transform: translateY(-10vh) rotate(360deg) scale(0.3); 
+                opacity: 0; 
+            }
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: 
+                0 8px 32px rgba(31, 38, 135, 0.37),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            animation: slideInUp 0.8s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, 
+                rgba(135, 206, 235, 0.5), 
+                rgba(176, 224, 230, 0.3), 
+                rgba(255, 255, 255, 0.2),
+                rgba(135, 206, 235, 0.5));
+            background-size: 400% 400%;
+            border-radius: 20px;
+            z-index: -1;
+            opacity: 0;
+            animation: borderFlow 3s ease-in-out infinite;
+            transition: opacity 0.3s ease;
+        }
+
+        @keyframes borderFlow {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .glass-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 
+                0 20px 60px rgba(31, 38, 135, 0.6),
+                0 0 40px rgba(135, 206, 235, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            background: rgba(135, 206, 235, 0.2);
+        }
+
+        .glass-card:hover::before {
+            opacity: 1;
+        }
+
+        .glass-card:active {
+            transform: translateY(-5px) scale(0.98);
+            transition: all 0.1s ease;
+        }
+
+        @keyframes slideInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .nav-tabs .nav-link {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--accent-blue);
+            font-weight: 600;
+            margin-right: 10px;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .nav-tabs .nav-link.active {
+            background: var(--secondary-blue);
+            border-color: var(--accent-blue);
+            color: white;
+        }
+
+        .document-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            height: 150px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.6s ease-out forwards;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .document-card:nth-child(1) { animation-delay: 0.1s; }
+        .document-card:nth-child(2) { animation-delay: 0.2s; }
+        .document-card:nth-child(3) { animation-delay: 0.3s; }
+        .document-card:nth-child(4) { animation-delay: 0.4s; }
+        .document-card:nth-child(5) { animation-delay: 0.5s; }
+        .document-card:nth-child(6) { animation-delay: 0.6s; }
+        .document-card:nth-child(7) { animation-delay: 0.7s; }
+
+        .document-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, 
+                var(--accent-blue), 
+                var(--secondary-blue), 
+                var(--primary-blue), 
+                var(--accent-blue));
+            border-radius: 12px;
+            z-index: -1;
+            opacity: 0;
+            animation: dashboardBorderPulse 3s ease-in-out infinite;
+            transition: opacity 0.3s ease;
+        }
+
+        .document-card::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(135, 206, 235, 0.4) 0%, transparent 70%);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.4s ease;
+            z-index: -1;
+        }
+
+        @keyframes dashboardBorderPulse {
+            0%, 100% {
+                background: linear-gradient(45deg, 
+                    var(--accent-blue), 
+                    var(--secondary-blue), 
+                    var(--primary-blue), 
+                    var(--accent-blue));
+            }
+            50% {
+                background: linear-gradient(45deg, 
+                    var(--secondary-blue), 
+                    var(--primary-blue), 
+                    var(--accent-blue), 
+                    var(--secondary-blue));
+            }
+        }
+
+        .document-card:hover {
+            transform: scale(1.08) translateY(-8px);
+            background: rgba(135, 206, 235, 0.25);
+            box-shadow: 
+                0 20px 40px rgba(70, 130, 180, 0.4),
+                0 0 30px rgba(135, 206, 235, 0.3);
+            border-color: transparent;
+        }
+
+        .document-card:hover::before {
+            opacity: 1;
+        }
+
+        .document-card:hover::after {
+            width: 200px;
+            height: 200px;
+        }
+
+        .document-card:active {
+            transform: scale(1.02) translateY(-3px);
+        }
+
+        /* Click ripple effect for dashboard cards */
+        .document-card.clicked::after {
+            width: 300px !important;
+            height: 300px !important;
+            background: radial-gradient(circle, rgba(135, 206, 235, 0.6) 0%, transparent 70%) !important;
+            animation: dashboardClickRipple 0.6s ease-out;
+        }
+
+        @keyframes dashboardClickRipple {
+            0% {
+                width: 0;
+                height: 0;
+                opacity: 1;
+            }
+            100% {
+                width: 300px;
+                height: 300px;
+                opacity: 0;
+            }
+        }
+
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .document-card i {
+            font-size: 2.5rem;
+            color: var(--accent-blue);
+            margin-bottom: 10px;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            animation: iconPulse 2s ease-in-out infinite;
+            display: inline-block;
+        }
+
+        .document-card:hover i {
+            transform: scale(1.3) rotate(10deg) translateY(-3px);
+            color: var(--secondary-blue);
+            text-shadow: 0 0 20px rgba(135, 206, 235, 0.8);
+            animation: dashboardIconBounce 0.6s ease-in-out;
+        }
+
+        @keyframes iconPulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes dashboardIconBounce {
+            0%, 100% {
+                transform: scale(1.3) rotate(10deg) translateY(-3px);
+            }
+            25% {
+                transform: scale(1.4) rotate(12deg) translateY(-5px);
+            }
+            50% {
+                transform: scale(1.25) rotate(8deg) translateY(-2px);
+            }
+            75% {
+                transform: scale(1.35) rotate(11deg) translateY(-4px);
+            }
+        }
+
+        .document-card h5 {
+            color: var(--accent-blue);
+            font-weight: 600;
+            margin: 0;
+            transition: all 0.3s ease;
+        }
+
+        .document-card:hover h5 {
+            color: var(--secondary-blue);
+            text-shadow: 0 0 15px rgba(135, 206, 235, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .upload-zone {
+            border: 2px dashed var(--accent-blue);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            background: var(--glass-bg);
+            backdrop-filter: blur(8px);
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(30px) scale(0.95);
+            animation: uploadZoneEntry 0.6s ease-out forwards;
+        }
+
+        .upload-zone:nth-child(1) { animation-delay: 0.1s; }
+        .upload-zone:nth-child(2) { animation-delay: 0.2s; }
+        .upload-zone:nth-child(3) { animation-delay: 0.3s; }
+        .upload-zone:nth-child(4) { animation-delay: 0.4s; }
+        .upload-zone:nth-child(5) { animation-delay: 0.5s; }
+        .upload-zone:nth-child(6) { animation-delay: 0.6s; }
+        .upload-zone:nth-child(7) { animation-delay: 0.7s; }
+
+        @keyframes uploadZoneEntry {
+            0% {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .upload-zone::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, 
+                var(--accent-blue), 
+                var(--secondary-blue), 
+                var(--primary-blue), 
+                var(--accent-blue));
+            border-radius: 12px;
+            z-index: -1;
+            opacity: 0;
+            animation: borderPulse 3s ease-in-out infinite;
+            transition: opacity 0.3s ease;
+        }
+
+        .upload-zone::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(135, 206, 235, 0.3) 0%, transparent 70%);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.4s ease;
+            z-index: -1;
+        }
+
+        @keyframes borderPulse {
+            0%, 100% {
+                background: linear-gradient(45deg, 
+                    var(--accent-blue), 
+                    var(--secondary-blue), 
+                    var(--primary-blue), 
+                    var(--accent-blue));
+            }
+            50% {
+                background: linear-gradient(45deg, 
+                    var(--secondary-blue), 
+                    var(--primary-blue), 
+                    var(--accent-blue), 
+                    var(--secondary-blue));
+            }
+        }
+
+        .upload-zone:hover {
+            border-color: transparent;
+            background: rgba(135, 206, 235, 0.2);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 
+                0 15px 35px rgba(70, 130, 180, 0.3),
+                0 0 25px rgba(135, 206, 235, 0.4);
+        }
+
+        .upload-zone:hover::before {
+            opacity: 1;
+        }
+
+        .upload-zone:hover::after {
+            width: 300px;
+            height: 300px;
+        }
+
+        .upload-zone:active {
+            transform: translateY(-5px) scale(0.98);
+        }
+
+        .upload-zone i {
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            display: inline-block;
+        }
+
+        .upload-zone:hover i {
+            transform: translateY(-5px) scale(1.1);
+            animation: iconBounce 0.6s ease-in-out;
+            color: var(--secondary-blue) !important;
+            text-shadow: 0 0 15px rgba(135, 206, 235, 0.6);
+        }
+
+        @keyframes iconBounce {
+            0%, 100% {
+                transform: translateY(-5px) scale(1.1);
+            }
+            25% {
+                transform: translateY(-8px) scale(1.15);
+            }
+            50% {
+                transform: translateY(-3px) scale(1.05);
+            }
+            75% {
+                transform: translateY(-6px) scale(1.12);
+            }
+        }
+
+        .upload-zone h5 {
+            transition: all 0.3s ease;
+        }
+
+        .upload-zone:hover h5 {
+            color: var(--secondary-blue) !important;
+            text-shadow: 0 0 10px rgba(135, 206, 235, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .upload-zone p {
+            transition: all 0.3s ease;
+        }
+
+        .upload-zone:hover p {
+            color: var(--accent-blue) !important;
+            transform: translateY(-1px);
+        }
+
+        /* Click ripple effect */
+        .upload-zone.clicked::after {
+            width: 400px !important;
+            height: 400px !important;
+            background: radial-gradient(circle, rgba(135, 206, 235, 0.6) 0%, transparent 70%) !important;
+            animation: clickRipple 0.6s ease-out;
+        }
+
+        @keyframes clickRipple {
+            0% {
+                width: 0;
+                height: 0;
+                opacity: 1;
+            }
+            100% {
+                width: 400px;
+                height: 400px;
+                opacity: 0;
+            }
+        }
+
+        .modal-content {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--secondary-blue) 100%);
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            padding: 14px 24px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 
+                0 4px 15px rgba(70, 130, 180, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--secondary-blue) 0%, var(--primary-blue) 100%);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 
+                0 8px 25px rgba(70, 130, 180, 0.6),
+                0 0 30px rgba(135, 206, 235, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:active {
+            transform: translateY(-1px) scale(0.98);
+            transition: all 0.1s ease;
+        }
+
+        .btn-primary:focus {
+            box-shadow: 
+                0 0 0 0.3rem rgba(70, 130, 180, 0.25),
+                0 4px 15px rgba(70, 130, 180, 0.4);
+        }
+
+        .year-selector {
+            background: var(--glass-bg);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            color: var(--accent-blue);
+        }
+
+        .document-item {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .view-btn, .download-btn, .delete-btn {
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            font-size: 14px;
+        }
+
+        .view-btn {
+            background: var(--accent-blue);
+        }
+
+        .download-btn {
+            background: #28a745;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+        }
+
+        .view-btn:hover {
+            background: var(--secondary-blue);
+            transform: scale(1.1);
+        }
+
+        .download-btn:hover {
+            background: #218838;
+            transform: scale(1.1);
+        }
+
+        .delete-btn:hover {
+            background: #c82333;
+            transform: scale(1.1);
+        }
+
+        .view-btn:active, .download-btn:active, .delete-btn:active {
+            transform: scale(0.95);
+        }
+
+        .view-btn i, .download-btn i, .delete-btn i {
+            transition: all 0.3s ease;
+        }
+
+        .view-btn:hover i {
+            animation: eyeBlink 0.6s ease-in-out;
+        }
+
+        .download-btn:hover i {
+            animation: downloadBounce 0.6s ease-in-out;
+        }
+
+        .delete-btn:hover i {
+            animation: deleteShake 0.6s ease-in-out;
+        }
+
+        .view-btn.loading i {
+            animation: eyeLoading 1s infinite;
+        }
+
+        @keyframes eyeBlink {
+            0% { transform: scaleY(1); }
+            50% { transform: scaleY(0.1); }
+            100% { transform: scaleY(1); }
+        }
+
+        @keyframes eyeLoading {
+            0% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(90deg) scale(1.2); }
+            50% { transform: rotate(180deg) scale(1); }
+            75% { transform: rotate(270deg) scale(1.2); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
+        @keyframes downloadBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+
+        @keyframes deleteShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-2px); }
+            75% { transform: translateX(2px); }
+        }
+
+        .view-btn::before, .download-btn::before, .delete-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.3s ease;
+        }
+
+        .view-btn:active::before, .download-btn:active::before, .delete-btn:active::before {
+            width: 100px;
+            height: 100px;
+        }
+
+        .pdf-viewer {
+            width: 100%;
+            height: 600px;
+            border: none;
+            border-radius: 10px;
+            opacity: 0;
+            transform: scale(0.9);
+            transition: all 0.4s ease;
+        }
+
+        .pdf-viewer.loaded {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Custom modal animations */
+        .modal.fade .modal-dialog {
+            transform: scale(0.8) translateY(-50px);
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .modal.show .modal-dialog {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-content {
+            overflow: hidden;
+        }
+
+        .modal-body {
+            position: relative;
+        }
+
+        .modal-body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, 
+                rgba(135, 206, 235, 0.1) 0%, 
+                rgba(176, 224, 230, 0.1) 50%, 
+                rgba(135, 206, 235, 0.1) 100%);
+            opacity: 0;
+            animation: shimmer 2s infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @keyframes shimmer {
+            0% { opacity: 0; transform: translateX(-100%); }
+            50% { opacity: 0.3; transform: translateX(0%); }
+            100% { opacity: 0; transform: translateX(100%); }
+        }
+
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(135, 206, 235, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .loading-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(70, 130, 180, 0.3);
+            border-top: 4px solid var(--accent-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Animated title styles */
+        .animated-title {
+            animation: titleGlow 3s ease-in-out infinite alternate;
+            text-shadow: 0 0 10px rgba(70, 130, 180, 0.3);
+        }
+
+        .title-icon {
+            animation: titleIconFloat 2s ease-in-out infinite;
+            display: inline-block;
+        }
+
+        @keyframes titleGlow {
+            0% {
+                text-shadow: 0 0 10px rgba(70, 130, 180, 0.3);
+            }
+            100% {
+                text-shadow: 0 0 20px rgba(70, 130, 180, 0.6), 0 0 30px rgba(135, 206, 235, 0.4);
+            }
+        }
+
+        @keyframes titleIconFloat {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        /* Login screen specific styles */
+        #loginScreen .glass-card {
+            max-width: 420px;
+            margin: 0 auto;
+        }
+
+        #loginScreen .form-control {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(135, 206, 235, 0.3);
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 16px;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+        }
+
+        #loginScreen .form-control:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 
+                0 0 0 0.3rem rgba(70, 130, 180, 0.25),
+                0 0 20px rgba(135, 206, 235, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        #loginScreen .form-control:hover {
+            border-color: rgba(135, 206, 235, 0.5);
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-1px);
+        }
+
+        #loginScreen .form-control::placeholder {
+            color: rgba(70, 130, 180, 0.7);
+            transition: all 0.3s ease;
+        }
+
+        #loginScreen .form-control:focus::placeholder {
+            color: rgba(70, 130, 180, 0.5);
+            transform: translateX(5px);
+        }
+
+        /* Enhanced form labels */
+        #loginScreen .form-label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        #loginScreen .form-label i {
+            transition: all 0.3s ease;
+        }
+
+        #loginScreen .form-control:focus + .form-label,
+        #loginScreen .form-control:focus ~ .form-label {
+            color: var(--secondary-blue) !important;
+            text-shadow: 0 0 10px rgba(135, 206, 235, 0.5);
+        }
+
+        #loginScreen .form-control:focus + .form-label i,
+        #loginScreen .form-control:focus ~ .form-label i {
+            transform: scale(1.1);
+            color: var(--secondary-blue) !important;
+        }
+
+        /* Password toggle button styles */
+        .password-toggle-btn {
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .password-toggle-btn:hover {
+            background: rgba(135, 206, 235, 0.2) !important;
+            color: var(--secondary-blue) !important;
+            transform: scale(1.1);
+        }
+
+        .password-toggle-btn:active {
+            transform: scale(0.95);
+        }
+
+        .password-toggle-btn i {
+            transition: all 0.3s ease;
+        }
+
+        .password-toggle-btn:hover i {
+            animation: eyeBlink 0.6s ease-in-out;
+        }
+
+        /* Shake animation for login errors */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        /* Login button loading animation */
+        .btn-primary:disabled {
+            opacity: 0.8;
+            cursor: not-allowed;
+        }
+
+        /* Security icon animation styles */
+        .security-icon-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .security-icon {
+            font-size: 4rem;
+            position: relative;
+            z-index: 3;
+            animation: securityIconFloat 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 20px rgba(70, 130, 180, 0.5));
+        }
+
+        .security-pulse, .security-pulse-2 {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 2px solid var(--accent-blue);
+            border-radius: 50%;
+            opacity: 0;
+        }
+
+        .security-pulse {
+            width: 80px;
+            height: 80px;
+            animation: securityPulse 2s ease-out infinite;
+        }
+
+        .security-pulse-2 {
+            width: 120px;
+            height: 120px;
+            animation: securityPulse 2s ease-out infinite 1s;
+        }
+
+        @keyframes securityIconFloat {
+            0%, 100% {
+                transform: translateY(0px) scale(1);
+            }
+            50% {
+                transform: translateY(-10px) scale(1.05);
+            }
+        }
+
+        @keyframes securityPulse {
+            0% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(1.5);
+            }
+        }
+
+        /* Logout button styles */
+        .btn-outline-danger {
+            border-color: #dc3545;
+            color: #dc3545;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-danger:hover {
+            background-color: #dc3545;
+            border-color: #dc3545;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        /* UiTM Logo Styles */
+        .logo-container {
+            animation: logoEntry 1s ease-out;
+        }
+
+        .uitm-logo {
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 4px 8px rgba(30, 60, 114, 0.3));
+        }
+
+        .uitm-logo:hover {
+            transform: scale(1.05);
+            filter: drop-shadow(0 6px 12px rgba(30, 60, 114, 0.4));
+        }
+
+        @keyframes logoEntry {
+            0% {
+                opacity: 0;
+                transform: translateX(-30px) scale(0.8);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+
+        /* Logo shield animation */
+        .uitm-logo path[fill*="shieldGradient"] {
+            animation: shieldGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes shieldGlow {
+            0% {
+                filter: drop-shadow(0 0 5px rgba(135, 206, 235, 0.3));
+            }
+            100% {
+                filter: drop-shadow(0 0 15px rgba(135, 206, 235, 0.6));
+            }
+        }
+
+        /* Employee Welcome Popup Styles */
+        .employee-welcome-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 2px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 
+                0 20px 60px rgba(31, 38, 135, 0.6),
+                0 0 40px rgba(135, 206, 235, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            z-index: 9999;
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .employee-welcome-popup::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, 
+                var(--accent-blue), 
+                var(--secondary-blue), 
+                var(--primary-blue), 
+                var(--accent-blue));
+            background-size: 400% 400%;
+            border-radius: 20px;
+            z-index: -1;
+            animation: welcomeBorderFlow 3s ease-in-out infinite;
+        }
+
+        @keyframes welcomeBorderFlow {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .employee-welcome-popup.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .employee-welcome-popup.hide {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.8);
+        }
+
+        .employee-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 4px solid var(--accent-blue);
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--secondary-blue) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: white;
+            animation: avatarPulse 2s ease-in-out infinite;
+            box-shadow: 
+                0 8px 25px rgba(70, 130, 180, 0.4),
+                0 0 30px rgba(135, 206, 235, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .employee-avatar::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: avatarShine 3s ease-in-out infinite;
+        }
+
+        @keyframes avatarPulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 
+                    0 8px 25px rgba(70, 130, 180, 0.4),
+                    0 0 30px rgba(135, 206, 235, 0.3);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 
+                    0 12px 35px rgba(70, 130, 180, 0.6),
+                    0 0 40px rgba(135, 206, 235, 0.5);
+            }
+        }
+
+        @keyframes avatarShine {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .employee-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px rgba(70, 130, 180, 0.3);
+            animation: nameGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes nameGlow {
+            0% {
+                text-shadow: 0 0 10px rgba(70, 130, 180, 0.3);
+            }
+            100% {
+                text-shadow: 0 0 20px rgba(70, 130, 180, 0.6), 0 0 30px rgba(135, 206, 235, 0.4);
+            }
+        }
+
+        .employee-details {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(135, 206, 235, 0.2);
+        }
+
+        .employee-detail-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .employee-detail-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .employee-detail-item i {
+            width: 20px;
+            color: var(--accent-blue);
+            margin-right: 10px;
+            animation: iconFloat 2s ease-in-out infinite;
+        }
+
+        .employee-detail-item:nth-child(1) i { animation-delay: 0s; }
+        .employee-detail-item:nth-child(2) i { animation-delay: 0.2s; }
+        .employee-detail-item:nth-child(3) i { animation-delay: 0.4s; }
+
+        @keyframes iconFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-2px); }
+        }
+
+        .welcome-message {
+            color: var(--secondary-blue);
+            font-weight: 600;
+            margin-bottom: 15px;
+            animation: messageSlide 0.8s ease-out 0.5s both;
+        }
+
+        @keyframes messageSlide {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .popup-timer {
+            width: 100%;
+            height: 4px;
+            background: rgba(135, 206, 235, 0.2);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+
+        .popup-timer-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-blue), var(--secondary-blue));
+            border-radius: 2px;
+            width: 100%;
+            animation: timerCountdown 5s linear;
+            box-shadow: 0 0 10px rgba(135, 206, 235, 0.5);
+        }
+
+        @keyframes timerCountdown {
+            0% { width: 100%; }
+            100% { width: 0%; }
+        }
+
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+            z-index: 9998;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .popup-overlay.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating particles background -->
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="container-fluid py-4">
+        <div class="row justify-content-center align-items-center min-vh-100">
+            <div class="col-md-6 col-lg-4">
+                <div class="glass-card p-5">
+                    <div class="text-center mb-4">
+                        <div class="security-icon-container mb-3">
+                            <i class="fas fa-shield-alt security-icon" style="color: var(--accent-blue);"></i>
+                            <div class="security-pulse"></div>
+                            <div class="security-pulse-2"></div>
+                        </div>
+                        <h2 class="animated-title" style="color: var(--accent-blue);">Sistem Keselamatan</h2>
+                        <img src="img/logo.png" alt="Logo UiTM Penerbit" style="height: 40px;">
+                    </div>
+                    
+                    <form id="loginForm" onsubmit="handleLogin(event)">
+                        <div class="mb-3">
+                            <label for="employeeId" class="form-label" style="color: var(--accent-blue); font-weight: 600;">
+                                <i class="fas fa-id-badge me-2"></i>Nombor Pekerja
+                            </label>
+                            <input type="text" class="form-control year-selector" id="employeeId" placeholder="Masukkan nombor pekerja" required>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="password" class="form-label" style="color: var(--accent-blue); font-weight: 600;">
+                                <i class="fas fa-lock me-2"></i>Kata Laluan
+                            </label>
+                            <div class="position-relative">
+                                <input type="password" class="form-control year-selector" id="password" placeholder="Masukkan kata laluan" required>
+                                <button type="button" class="btn position-absolute end-0 top-0 h-100 px-3 password-toggle-btn" onclick="togglePassword()" style="border: none; background: none; color: var(--accent-blue); border-radius: 0 12px 12px 0;">
+                                    <i class="fas fa-eye" id="passwordToggleIcon"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="loginError" class="alert alert-danger d-none mb-3">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <span id="loginErrorMessage"></span>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100 py-3" id="loginBtn">
+                            <i class="fas fa-sign-in-alt me-2"></i>Log Masuk
+                        </button>
+                    </form>
+                    
+                    <div class="text-center mt-4">
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Sistem Simpan Dokumen PDF - Akses Terhad
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main System (Hidden by default) -->
+    <div id="mainSystem" class="container-fluid py-4" style="display: none;">
+        <div class="row">
+            <div class="col-12">
+                <div class="glass-card p-4 mb-4">
+                    <!-- Header with Logo and Logout Button -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <!-- UiTM Penerbit Logo -->
+                        <div class="logo-container">
+                            <img src="img/logo.png" alt="Logo UiTM Penerbit" style="height: 60px;">
+                        </div>
+                        
+                        <!-- Logout Button -->
+                        <button class="btn btn-outline-danger" onclick="handleLogout()">
+                            <i class="fas fa-sign-out-alt me-2"></i>Log Keluar
+                        </button>
+                    </div>
+                    <h1 class="text-center mb-4 animated-title" style="color: var(--accent-blue);">
+                        <i class="fas fa-file-pdf me-3 title-icon"></i>Sistem Fail (Dokumen PDF)
+                    </h1>
+                    
+                    <!-- Year Selector -->
+                    <div class="row mb-4">
+                        <div class="col-md-6 mx-auto">
+                            <label class="form-label" style="color: var(--accent-blue); font-weight: 600;">Pilih Tahun:</label>
+                            <select class="form-select year-selector" id="yearSelector">
+                                <!-- Years will be populated by JavaScript -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Navigation Tabs -->
+                    <ul class="nav nav-tabs justify-content-center mb-4" id="mainTabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="dashboard-tab" data-bs-toggle="tab" href="#dashboard">
+                                <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="upload-tab" data-bs-toggle="tab" href="#upload">
+                                <i class="fas fa-cloud-upload-alt me-2"></i>Upload
+                            </a>
+                        </li>
+                    </ul>
+
+                    <!-- Tab Content -->
+                    <div class="tab-content">
+                        <!-- Dashboard Tab -->
+                        <div class="tab-pane fade show active" id="dashboard">
+                            <div class="row g-4">
+                                <div class="col-lg-3 col-md-4 col-sm-6">
+                                    <div class="document-card" onclick="handleDashboardClick(this, 'quotation')">
+                                        <i class="fas fa-file-contract"></i>
+                                        <h5>Quotation</h5>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-md-4 col-sm-6">
+                                    <div class="document-card" onclick="handleDashboardClick(this, 'delivery-order')">
+                                        <i class="fas fa-truck"></i>
+                                        <h5>Delivery Order</h5>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-md-4 col-sm-6">
+                                    <div class="document-card" onclick="handleDashboardClick(this, 'credit-note')">
+                                        <i class="fas fa-credit-card"></i>
+                                        <h5>Credit Note</h5>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-md-4 col-sm-6">
+                                    <div class="document-card" onclick="handleDashboardClick(this, 'debit-note')">
+                                        <i class="fas fa-receipt"></i>
+                                        <h5>Debit Note</h5>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-md-4 col-sm-6">
+                                    <div class="document-card" onclick="handleDashboardClick(this, 'payment-confirmation')">
+                                        <i class="fas fa-check-circle"></i>
+                                        <h5>Pengesahan Bayaran</h5>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-md-4 col-sm-6">
+                                    <div class="document-card" onclick="handleDashboardClick(this, 'invoice-application')">
+                                        <i class="fas fa-file-invoice"></i>
+                                        <h5>Pemohonan Invois</h5>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-md-4 col-sm-6">
+                                    <div class="document-card" onclick="handleDashboardClick(this, 'bookstore')">
+                                        <i class="fas fa-book-open"></i>
+                                        <h5>Kedai Buku</h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Upload Tab -->
+                        <div class="tab-pane fade" id="upload">
+                            <div class="row g-4">
+                                <div class="col-lg-6 col-md-6">
+                                    <div class="upload-zone" onclick="handleUploadClick(this, 'quotation-upload')">
+                                        <i class="fas fa-file-contract fa-3x mb-3" style="color: var(--accent-blue);"></i>
+                                        <h5 style="color: var(--accent-blue);">Upload Quotation</h5>
+                                        <p class="text-muted">Klik untuk pilih fail PDF</p>
+                                        <input type="file" id="quotation-upload" accept=".pdf" multiple style="display: none;" onchange="handleFileUpload(this, 'quotation')">
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6">
+                                    <div class="upload-zone" onclick="handleUploadClick(this, 'delivery-order-upload')">
+                                        <i class="fas fa-truck fa-3x mb-3" style="color: var(--accent-blue);"></i>
+                                        <h5 style="color: var(--accent-blue);">Upload Delivery Order</h5>
+                                        <p class="text-muted">Klik untuk pilih fail PDF</p>
+                                        <input type="file" id="delivery-order-upload" accept=".pdf" multiple style="display: none;" onchange="handleFileUpload(this, 'delivery-order')">
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6">
+                                    <div class="upload-zone" onclick="handleUploadClick(this, 'credit-note-upload')">
+                                        <i class="fas fa-credit-card fa-3x mb-3" style="color: var(--accent-blue);"></i>
+                                        <h5 style="color: var(--accent-blue);">Upload Credit Note</h5>
+                                        <p class="text-muted">Klik untuk pilih fail PDF</p>
+                                        <input type="file" id="credit-note-upload" accept=".pdf" multiple style="display: none;" onchange="handleFileUpload(this, 'credit-note')">
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6">
+                                    <div class="upload-zone" onclick="handleUploadClick(this, 'debit-note-upload')">
+                                        <i class="fas fa-receipt fa-3x mb-3" style="color: var(--accent-blue);"></i>
+                                        <h5 style="color: var(--accent-blue);">Upload Debit Note</h5>
+                                        <p class="text-muted">Klik untuk pilih fail PDF</p>
+                                        <input type="file" id="debit-note-upload" accept=".pdf" multiple style="display: none;" onchange="handleFileUpload(this, 'debit-note')">
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6">
+                                    <div class="upload-zone" onclick="handleUploadClick(this, 'payment-confirmation-upload')">
+                                        <i class="fas fa-check-circle fa-3x mb-3" style="color: var(--accent-blue);"></i>
+                                        <h5 style="color: var(--accent-blue);">Upload Pengesahan Bayaran</h5>
+                                        <p class="text-muted">Klik untuk pilih fail PDF</p>
+                                        <input type="file" id="payment-confirmation-upload" accept=".pdf" multiple style="display: none;" onchange="handleFileUpload(this, 'payment-confirmation')">
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6">
+                                    <div class="upload-zone" onclick="handleUploadClick(this, 'invoice-application-upload')">
+                                        <i class="fas fa-file-invoice fa-3x mb-3" style="color: var(--accent-blue);"></i>
+                                        <h5 style="color: var(--accent-blue);">Upload Pemohonan Invois</h5>
+                                        <p class="text-muted">Klik untuk pilih fail PDF</p>
+                                        <input type="file" id="invoice-application-upload" accept=".pdf" multiple style="display: none;" onchange="handleFileUpload(this, 'invoice-application')">
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6 mx-auto">
+                                    <div class="upload-zone" onclick="handleUploadClick(this, 'bookstore-upload')">
+                                        <i class="fas fa-book-open fa-3x mb-3" style="color: var(--accent-blue);"></i>
+                                        <h5 style="color: var(--accent-blue);">Upload Kedai Buku</h5>
+                                        <p class="text-muted">Klik untuk pilih fail PDF</p>
+                                        <input type="file" id="bookstore-upload" accept=".pdf" multiple style="display: none;" onchange="handleFileUpload(this, 'bookstore')">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Document List Modal -->
+    <div class="modal fade" id="documentModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="documentModalTitle" style="color: var(--accent-blue);"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Search Box -->
+                    <div class="mb-3">
+                        <div class="position-relative">
+                            <input type="text" class="form-control year-selector" id="documentSearch" placeholder="Cari nama PDF..." style="padding-left: 45px;">
+                            <i class="fas fa-search position-absolute" style="left: 15px; top: 50%; transform: translateY(-50%); color: var(--accent-blue); opacity: 0.7;"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- Document List -->
+                    <div id="documentList">
+                        <!-- Document list will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PDF Viewer Modal -->
+    <div class="modal fade" id="pdfModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="pdfModalTitle" style="color: var(--accent-blue);"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="loading-overlay" id="pdfLoadingOverlay">
+                        <div class="loading-spinner"></div>
+                    </div>
+                    <iframe id="pdfViewer" class="pdf-viewer"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Google Apps Script Web App URL - GANTI DENGAN URL ANDA
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwDDOqk9BA6UhcSW_2Aj15KA4WYa-sj-ZBRu0iMIr_1w6BqJC9bXu9zRMVxPJ5tSl-Ciw/exec';
+        
+        // Initialize storage and year selector
+        let documentStorage = {};
+        let currentYear = new Date().getFullYear();
+
+        // Google Drive API Functions with CORS fix
+        async function saveToGoogleDrive(data) {
+            try {
+                // Use form data instead of JSON to avoid CORS preflight
+                const formData = new FormData();
+                formData.append('action', 'save');
+                formData.append('data', JSON.stringify(data));
+                
+                const response = await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                return result.success;
+            } catch (error) {
+                console.error('Error saving to Google Drive:', error);
+                return false;
+            }
+        }
+
+        async function loadFromGoogleDrive() {
+            try {
+                const response = await fetch(GOOGLE_SCRIPT_URL + '?action=load', {
+                    method: 'GET'
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    documentStorage = result.data || {};
+                    return true;
+                }
+                return false;
+            } catch (error) {
+                console.error('Error loading from Google Drive:', error);
+                return false;
+            }
+        }
+
+        async function deleteFromGoogleDrive(docId, category, year) {
+            try {
+                // Use form data instead of JSON to avoid CORS preflight
+                const formData = new FormData();
+                formData.append('action', 'delete');
+                formData.append('docId', docId);
+                formData.append('category', category);
+                formData.append('year', year);
+                
+                const response = await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                return result.success;
+            } catch (error) {
+                console.error('Error deleting from Google Drive:', error);
+                return false;
+            }
+        }
+
+        // Populate year selector
+        function populateYearSelector() {
+            const yearSelector = document.getElementById('yearSelector');
+            const startYear = 2025;
+            const endYear = startYear + 50; // 50 years into the future
+            
+            for (let year = startYear; year <= endYear; year++) {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                if (year === currentYear || (currentYear < startYear && year === startYear)) {
+                    option.selected = true;
+                }
+                yearSelector.appendChild(option);
+            }
+        }
+
+        // Handle year change
+        document.getElementById('yearSelector').addEventListener('change', function() {
+            currentYear = parseInt(this.value);
+        });
+
+        // Handle file upload with Google Drive integration
+        async function handleFileUpload(input, category) {
+            const files = input.files;
+            const selectedYear = currentYear;
+            
+            if (!documentStorage[selectedYear]) {
+                documentStorage[selectedYear] = {};
+            }
+            if (!documentStorage[selectedYear][category]) {
+                documentStorage[selectedYear][category] = [];
+            }
+
+            // Show loading toast
+            showToast('📤 Sedang memuat naik fail ke Google Drive...', 'info');
+
+            for (let file of files) {
+                if (file.type === 'application/pdf') {
+                    const reader = new FileReader();
+                    reader.onload = async function(e) {
+                        const document = {
+                            name: file.name,
+                            data: e.target.result,
+                            uploadDate: new Date().toLocaleDateString('ms-MY'),
+                            id: Date.now() + Math.random(),
+                            category: category,
+                            year: selectedYear
+                        };
+                        
+                        // Add to local storage first
+                        documentStorage[selectedYear][category].push(document);
+                        
+                        // Save to Google Drive
+                        const success = await saveToGoogleDrive(documentStorage);
+                        
+                        if (success) {
+                            showToast(`✅ ${file.name} berjaya disimpan ke Google Drive!`, 'success');
+                        } else {
+                            // Fallback to localStorage if Google Drive fails
+                            localStorage.setItem('pdfDocuments', JSON.stringify(documentStorage));
+                            showToast(`⚠️ ${file.name} disimpan secara tempatan (Google Drive tidak tersedia)`, 'warning');
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+            
+            // Clear input
+            input.value = '';
+        }
+
+        // Show documents for category
+        function showDocuments(category) {
+            const selectedYear = currentYear;
+            const categoryName = getCategoryName(category);
+            
+            document.getElementById('documentModalTitle').textContent = `${categoryName} - Tahun ${selectedYear}`;
+            
+            // Clear search box
+            document.getElementById('documentSearch').value = '';
+            
+            // Store current category for search functionality
+            window.currentCategory = category;
+            
+            // Display all documents initially
+            displayDocuments(category, '');
+            
+            // Set up search functionality
+            const searchInput = document.getElementById('documentSearch');
+            searchInput.oninput = function() {
+                displayDocuments(category, this.value);
+            };
+            
+            new bootstrap.Modal(document.getElementById('documentModal')).show();
+        }
+
+        // Display documents with optional search filter
+        function displayDocuments(category, searchTerm = '') {
+            const selectedYear = currentYear;
+            const documentList = document.getElementById('documentList');
+            documentList.innerHTML = '';
+            
+            if (documentStorage[selectedYear] && documentStorage[selectedYear][category] && documentStorage[selectedYear][category].length > 0) {
+                // Filter documents based on search term
+                const filteredDocs = documentStorage[selectedYear][category].filter(doc => 
+                    doc.name.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+                
+                if (filteredDocs.length > 0) {
+                    filteredDocs.forEach(doc => {
+                        const docItem = document.createElement('div');
+                        docItem.className = 'document-item';
+                        
+                        // Highlight search term in document name
+                        let displayName = doc.name;
+                        if (searchTerm) {
+                            const regex = new RegExp(`(${searchTerm})`, 'gi');
+                            displayName = doc.name.replace(regex, '<mark style="background: var(--primary-blue); color: white; padding: 2px 4px; border-radius: 3px;">$1</mark>');
+                        }
+                        
+                        docItem.innerHTML = `
+                            <div>
+                                <i class="fas fa-file-pdf me-2" style="color: var(--accent-blue);"></i>
+                                <strong>${displayName}</strong>
+                                <br>
+                                <small class="text-muted">Dimuat naik: ${doc.uploadDate}</small>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="view-btn" onclick="viewPDF('${doc.id}', '${category}', '${doc.name}')" title="View PDF">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="download-btn" onclick="downloadPDF('${doc.id}', '${category}', '${doc.name}')" title="Download PDF">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                                <button class="delete-btn" onclick="deletePDF('${doc.id}', '${category}', '${doc.name}')" title="Delete PDF">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        `;
+                        documentList.appendChild(docItem);
+                    });
+                } else {
+                    // No documents found for search term
+                    documentList.innerHTML = `
+                        <div class="text-center py-4">
+                            <i class="fas fa-search fa-3x mb-3" style="color: var(--accent-blue); opacity: 0.5;"></i>
+                            <p class="text-muted">Tiada dokumen ditemui untuk "${searchTerm}"</p>
+                            <small class="text-muted">Cuba gunakan kata kunci yang berbeza</small>
+                        </div>
+                    `;
+                }
+            } else {
+                documentList.innerHTML = `
+                    <div class="text-center py-4">
+                        <i class="fas fa-folder-open fa-3x mb-3" style="color: var(--accent-blue); opacity: 0.5;"></i>
+                        <p class="text-muted">Tiada dokumen untuk kategori ini pada tahun ${currentYear}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // View PDF
+        function viewPDF(docId, category, fileName) {
+            const selectedYear = currentYear;
+            const doc = documentStorage[selectedYear][category].find(d => d.id == docId);
+            
+            if (doc) {
+                // Add loading animation to button
+                const clickedBtn = event.target.closest('.view-btn');
+                clickedBtn.classList.add('loading');
+                
+                // Set up PDF modal
+                document.getElementById('pdfModalTitle').textContent = fileName;
+                const pdfViewer = document.getElementById('pdfViewer');
+                const loadingOverlay = document.getElementById('pdfLoadingOverlay');
+                
+                // Reset PDF viewer state
+                pdfViewer.classList.remove('loaded');
+                loadingOverlay.classList.remove('hidden');
+                
+                // Hide document list modal first
+                bootstrap.Modal.getInstance(document.getElementById('documentModal')).hide();
+                
+                // Show PDF modal after a brief delay
+                setTimeout(() => {
+                    const pdfModal = new bootstrap.Modal(document.getElementById('pdfModal'));
+                    pdfModal.show();
+                    
+                    // Load PDF after modal is shown
+                    setTimeout(() => {
+                        pdfViewer.src = doc.data;
+                        
+                        // Simulate PDF loading time for smooth animation
+                        setTimeout(() => {
+                            loadingOverlay.classList.add('hidden');
+                            pdfViewer.classList.add('loaded');
+                            clickedBtn.classList.remove('loading');
+                        }, 800);
+                    }, 200);
+                }, 300);
+            }
+        }
+
+        // Get category display name
+        function getCategoryName(category) {
+            const names = {
+                'quotation': 'Quotation',
+                'delivery-order': 'Delivery Order',
+                'credit-note': 'Credit Note',
+                'debit-note': 'Debit Note',
+                'payment-confirmation': 'Pengesahan Bayaran',
+                'invoice-application': 'Pemohonan Invois',
+                'bookstore': 'Kedai Buku'
+            };
+            return names[category] || category;
+        }
+
+        // Show toast notification with different types
+        function showToast(message, type = 'success') {
+            let bgColor, icon;
+            
+            switch(type) {
+                case 'success':
+                    bgColor = 'var(--accent-blue)';
+                    icon = 'fas fa-check-circle';
+                    break;
+                case 'warning':
+                    bgColor = '#ffc107';
+                    icon = 'fas fa-exclamation-triangle';
+                    break;
+                case 'error':
+                    bgColor = '#dc3545';
+                    icon = 'fas fa-times-circle';
+                    break;
+                case 'info':
+                    bgColor = '#17a2b8';
+                    icon = 'fas fa-info-circle';
+                    break;
+                default:
+                    bgColor = 'var(--accent-blue)';
+                    icon = 'fas fa-check-circle';
+            }
+            
+            // Create toast element
+            const toastHtml = `
+                <div class="toast align-items-center text-white border-0 position-fixed top-0 end-0 m-3" style="background: ${bgColor}; z-index: 9999;" role="alert">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            <i class="${icon} me-2"></i>${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', toastHtml);
+            const toastElement = document.body.lastElementChild;
+            const toast = new bootstrap.Toast(toastElement, { delay: type === 'info' ? 3000 : 5000 });
+            toast.show();
+            
+            // Remove toast element after it's hidden
+            toastElement.addEventListener('hidden.bs.toast', () => {
+                toastElement.remove();
+            });
+        }
+
+        // Download PDF function
+        function downloadPDF(docId, category, fileName) {
+            const selectedYear = currentYear;
+            const doc = documentStorage[selectedYear][category].find(d => d.id == docId);
+            
+            if (doc) {
+                // Create download link
+                const link = document.createElement('a');
+                link.href = doc.data;
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                // Show success message
+                showToast(`${fileName} berjaya dimuat turun!`);
+            }
+        }
+
+        // Delete PDF function with Google Drive integration
+        async function deletePDF(docId, category, fileName) {
+            // Show confirmation dialog
+            if (confirm(`Adakah anda pasti untuk memadam "${fileName}"?\n\nTindakan ini tidak boleh dibatalkan.`)) {
+                const selectedYear = currentYear;
+                
+                // Show loading message
+                showToast('🗑️ Sedang memadam fail dari Google Drive...', 'info');
+                
+                // Find and remove the document
+                const docIndex = documentStorage[selectedYear][category].findIndex(d => d.id == docId);
+                if (docIndex > -1) {
+                    documentStorage[selectedYear][category].splice(docIndex, 1);
+                    
+                    // Delete from Google Drive
+                    const success = await deleteFromGoogleDrive(docId, category, selectedYear);
+                    
+                    if (success) {
+                        showToast(`✅ ${fileName} berjaya dipadam dari Google Drive!`, 'success');
+                    } else {
+                        // Fallback to localStorage
+                        localStorage.setItem('pdfDocuments', JSON.stringify(documentStorage));
+                        showToast(`⚠️ ${fileName} dipadam secara tempatan (Google Drive tidak tersedia)`, 'warning');
+                    }
+                    
+                    // Close current modal first
+                    const currentModal = bootstrap.Modal.getInstance(document.getElementById('documentModal'));
+                    if (currentModal) {
+                        currentModal.hide();
+                    }
+                    
+                    // Refresh the document list after a short delay
+                    setTimeout(() => {
+                        const searchTerm = document.getElementById('documentSearch').value;
+                        displayDocuments(category, searchTerm);
+                    }, 300);
+                }
+            }
+        }
+
+        // Handle upload zone click with animation
+        function handleUploadClick(uploadZone, inputId) {
+            // Add click animation
+            uploadZone.classList.add('clicked');
+            
+            // Remove the class after animation completes
+            setTimeout(() => {
+                uploadZone.classList.remove('clicked');
+            }, 600);
+            
+            // Trigger file input
+            document.getElementById(inputId).click();
+        }
+
+        // Handle dashboard card click with animation
+        function handleDashboardClick(card, category) {
+            // Add click animation
+            card.classList.add('clicked');
+            
+            // Remove the class after animation completes
+            setTimeout(() => {
+                card.classList.remove('clicked');
+            }, 600);
+            
+            // Show documents after a brief delay for smooth animation
+            setTimeout(() => {
+                showDocuments(category);
+            }, 200);
+        }
+
+        // Security system variables
+        const VALID_EMPLOYEE_ID = '352169';
+        const VALID_PASSWORD = '123456';
+        let isLoggedIn = false;
+
+        // Check if user is already logged in
+        function checkLoginStatus() {
+            const loginStatus = localStorage.getItem('isLoggedIn');
+            const loginTime = localStorage.getItem('loginTime');
+            const currentTime = new Date().getTime();
+            
+            // Session expires after 8 hours (8 * 60 * 60 * 1000 = 28800000 ms)
+            const sessionDuration = 8 * 60 * 60 * 1000;
+            
+            if (loginStatus === 'true' && loginTime && (currentTime - parseInt(loginTime)) < sessionDuration) {
+                isLoggedIn = true;
+                showMainSystem();
+            } else {
+                // Clear expired session
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('loginTime');
+                showLoginScreen();
+            }
+        }
+
+        // Handle login form submission
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const employeeId = document.getElementById('employeeId').value.trim();
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('loginBtn');
+            const loginError = document.getElementById('loginError');
+            const loginErrorMessage = document.getElementById('loginErrorMessage');
+            
+            // Add loading state to button
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Mengesahkan...';
+            loginBtn.disabled = true;
+            
+            // Hide previous error
+            loginError.classList.add('d-none');
+            
+            // Simulate authentication delay for better UX
+            setTimeout(() => {
+                if (employeeId === VALID_EMPLOYEE_ID && password === VALID_PASSWORD) {
+                    // Successful login
+                    isLoggedIn = true;
+                    localStorage.setItem('isLoggedIn', 'true');
+                    localStorage.setItem('loginTime', new Date().getTime().toString());
+                    
+                    // Show success message briefly
+                    loginBtn.innerHTML = '<i class="fas fa-check me-2"></i>Berjaya!';
+                    loginBtn.classList.remove('btn-primary');
+                    loginBtn.classList.add('btn-success');
+                    
+                    setTimeout(() => {
+                        showMainSystem();
+                        resetLoginForm();
+                    }, 1000);
+                    
+                } else {
+                    // Failed login
+                    loginErrorMessage.textContent = 'Nombor pekerja atau kata laluan tidak sah. Sila cuba lagi.';
+                    loginError.classList.remove('d-none');
+                    
+                    // Reset button
+                    loginBtn.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i>Log Masuk';
+                    loginBtn.disabled = false;
+                    
+                    // Clear password field
+                    document.getElementById('password').value = '';
+                    
+                    // Shake animation for error
+                    const loginCard = document.querySelector('.glass-card');
+                    loginCard.style.animation = 'shake 0.5s ease-in-out';
+                    setTimeout(() => {
+                        loginCard.style.animation = '';
+                    }, 500);
+                }
+            }, 1500);
+        }
+
+        // Toggle password visibility
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('passwordToggleIcon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+
+        // Show login screen
+        function showLoginScreen() {
+            document.getElementById('loginScreen').style.display = 'block';
+            document.getElementById('mainSystem').style.display = 'none';
+        }
+
+        // Show main system
+        function showMainSystem() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('mainSystem').style.display = 'block';
+            
+            // Show employee welcome popup
+            showEmployeeWelcomePopup();
+        }
+
+        // Handle logout
+        function handleLogout() {
+            if (confirm('Adakah anda pasti untuk log keluar dari sistem?')) {
+                isLoggedIn = false;
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('loginTime');
+                
+                // Show logout animation
+                const mainSystem = document.getElementById('mainSystem');
+                mainSystem.style.opacity = '0';
+                mainSystem.style.transform = 'scale(0.95)';
+                
+                setTimeout(() => {
+                    showLoginScreen();
+                    mainSystem.style.opacity = '1';
+                    mainSystem.style.transform = 'scale(1)';
+                    resetLoginForm();
+                    showToast('Anda telah berjaya log keluar dari sistem.');
+                }, 300);
+            }
+        }
+
+        // Reset login form
+        function resetLoginForm() {
+            document.getElementById('loginForm').reset();
+            document.getElementById('loginError').classList.add('d-none');
+            const loginBtn = document.getElementById('loginBtn');
+            loginBtn.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i>Log Masuk';
+            loginBtn.classList.remove('btn-success');
+            loginBtn.classList.add('btn-primary');
+            loginBtn.disabled = false;
+        }
+
+        // Show employee welcome popup
+        function showEmployeeWelcomePopup() {
+            // Create popup overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'popup-overlay';
+            
+            // Create popup element
+            const popup = document.createElement('div');
+            popup.className = 'employee-welcome-popup';
+            popup.innerHTML = `
+                <div class="employee-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="employee-name">MOHAMMAD AIMAN SYAZWEE</div>
+                <div class="employee-details">
+                    <div class="employee-detail-item">
+                        <i class="fas fa-id-badge"></i>
+                        <span><strong>NO. PEKERJA:</strong> 352169</span>
+                    </div>
+                    <div class="employee-detail-item">
+                        <i class="fas fa-briefcase"></i>
+                        <span><strong>JAWATAN:</strong> KERANI</span>
+                    </div>
+                    <div class="employee-detail-item">
+                        <i class="fas fa-building"></i>
+                        <span><strong>JABATAN:</strong> PENERBIT</span>
+                    </div>
+                </div>
+                <div class="welcome-message">
+                    <i class="fas fa-hand-wave me-2"></i>Selamat datang ke sistem!
+                </div>
+                <div class="popup-timer">
+                    <div class="popup-timer-bar"></div>
+                </div>
+            `;
+            
+            // Add elements to body
+            document.body.appendChild(overlay);
+            document.body.appendChild(popup);
+            
+            // Show popup with animation
+            setTimeout(() => {
+                overlay.classList.add('show');
+                popup.classList.add('show');
+            }, 100);
+            
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                hideEmployeeWelcomePopup(overlay, popup);
+            }, 5000);
+            
+            // Allow manual close by clicking overlay
+            overlay.addEventListener('click', () => {
+                hideEmployeeWelcomePopup(overlay, popup);
+            });
+        }
+
+        // Hide employee welcome popup
+        function hideEmployeeWelcomePopup(overlay, popup) {
+            overlay.classList.remove('show');
+            popup.classList.add('hide');
+            
+            // Remove elements after animation
+            setTimeout(() => {
+                if (overlay && overlay.parentNode) {
+                    overlay.parentNode.removeChild(overlay);
+                }
+                if (popup && popup.parentNode) {
+                    popup.parentNode.removeChild(popup);
+                }
+            }, 500);
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', async function() {
+            populateYearSelector();
+            
+            // Load data from Google Drive on startup
+            showToast('🔄 Sedang memuatkan data dari Google Drive...', 'info');
+            const loadSuccess = await loadFromGoogleDrive();
+            
+            if (!loadSuccess) {
+                // Fallback to localStorage if Google Drive fails
+                documentStorage = JSON.parse(localStorage.getItem('pdfDocuments')) || {};
+                showToast('⚠️ Menggunakan data tempatan (Google Drive tidak tersedia)', 'warning');
+            } else {
+                showToast('✅ Data berjaya dimuatkan dari Google Drive!', 'success');
+            }
+            
+            checkLoginStatus();
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+

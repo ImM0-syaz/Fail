@@ -3,26 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Fail Dokumen PDF</title>
+    <title>Sistem Simpan Dokumen PDF</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --primary-blue: #87CEEB;
-            --secondary-blue: #B0E0E6;
-            --accent-blue: #4682B4;
-            --glass-bg: rgba(135, 206, 235, 0.1);
-            --glass-border: rgba(135, 206, 235, 0.2);
+            --primary-blue: #4A90E2;
+            --secondary-blue: #357ABD;
+            --accent-blue: #2E5BBA;
+            --neu-bg: #E6F2FF;
+            --neu-shadow-dark: #B8D4F0;
+            --neu-shadow-light: #FFFFFF;
+            --neu-text: #2C3E50;
+            --neu-text-light: #5A6C7D;
+            --neu-surface: #E6F2FF;
         }
 
         body {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 25%, #87CEEB 50%, #B0E0E6 75%, #E0F6FF 100%);
-            background-size: 400% 400%;
-            animation: gradientShift 15s ease infinite;
+            background: var(--neu-bg);
             min-height: 100vh;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             position: relative;
             overflow-x: hidden;
+            color: var(--neu-text);
         }
 
         @keyframes gradientShift {
@@ -90,51 +93,41 @@
         }
 
         .glass-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(15px);
-            border: 1px solid var(--glass-border);
+            background: var(--neu-surface);
             border-radius: 20px;
             box-shadow: 
-                0 8px 32px rgba(31, 38, 135, 0.37),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+                8px 8px 16px var(--neu-shadow-dark),
+                -8px -8px 16px var(--neu-shadow-light);
             transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             animation: slideInUp 0.8s ease-out;
             position: relative;
             overflow: hidden;
+            border: none;
         }
 
         .glass-card::before {
             content: '';
             position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            background: linear-gradient(45deg, 
-                rgba(135, 206, 235, 0.5), 
-                rgba(176, 224, 230, 0.3), 
-                rgba(255, 255, 255, 0.2),
-                rgba(135, 206, 235, 0.5));
-            background-size: 400% 400%;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(145deg, 
+                rgba(255, 255, 255, 0.1), 
+                rgba(184, 212, 240, 0.1));
             border-radius: 20px;
             z-index: -1;
             opacity: 0;
-            animation: borderFlow 3s ease-in-out infinite;
             transition: opacity 0.3s ease;
         }
 
-        @keyframes borderFlow {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
-
         .glass-card:hover {
-            transform: translateY(-8px) scale(1.02);
+            transform: translateY(-4px);
             box-shadow: 
-                0 20px 60px rgba(31, 38, 135, 0.6),
-                0 0 40px rgba(135, 206, 235, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3);
-            background: rgba(135, 206, 235, 0.2);
+                12px 12px 24px var(--neu-shadow-dark),
+                -12px -12px 24px var(--neu-shadow-light),
+                inset 2px 2px 4px rgba(255, 255, 255, 0.1),
+                inset -2px -2px 4px rgba(184, 212, 240, 0.1);
         }
 
         .glass-card:hover::before {
@@ -142,7 +135,12 @@
         }
 
         .glass-card:active {
-            transform: translateY(-5px) scale(0.98);
+            transform: translateY(-2px);
+            box-shadow: 
+                4px 4px 8px var(--neu-shadow-dark),
+                -4px -4px 8px var(--neu-shadow-light),
+                inset 4px 4px 8px rgba(184, 212, 240, 0.2),
+                inset -4px -4px 8px rgba(255, 255, 255, 0.2);
             transition: all 0.1s ease;
         }
 
@@ -158,25 +156,37 @@
         }
 
         .nav-tabs .nav-link {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            color: var(--accent-blue);
+            background: var(--neu-surface);
+            border: none;
+            color: var(--neu-text);
             font-weight: 600;
             margin-right: 10px;
-            border-radius: 10px 10px 0 0;
+            border-radius: 15px;
+            box-shadow: 
+                4px 4px 8px var(--neu-shadow-dark),
+                -4px -4px 8px var(--neu-shadow-light);
+            transition: all 0.3s ease;
         }
 
         .nav-tabs .nav-link.active {
-            background: var(--secondary-blue);
-            border-color: var(--accent-blue);
-            color: white;
+            background: var(--neu-surface);
+            color: var(--primary-blue);
+            box-shadow: 
+                inset 4px 4px 8px var(--neu-shadow-dark),
+                inset -4px -4px 8px var(--neu-shadow-light);
+        }
+
+        .nav-tabs .nav-link:hover:not(.active) {
+            box-shadow: 
+                6px 6px 12px var(--neu-shadow-dark),
+                -6px -6px 12px var(--neu-shadow-light);
+            transform: translateY(-2px);
         }
 
         .document-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(8px);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
+            background: var(--neu-surface);
+            border: none;
+            border-radius: 20px;
             padding: 20px;
             text-align: center;
             cursor: pointer;
@@ -191,6 +201,9 @@
             animation: fadeInUp 0.6s ease-out forwards;
             position: relative;
             overflow: hidden;
+            box-shadow: 
+                8px 8px 16px var(--neu-shadow-dark),
+                -8px -8px 16px var(--neu-shadow-light);
         }
 
         .document-card:nth-child(1) { animation-delay: 0.1s; }
@@ -252,12 +265,12 @@
         }
 
         .document-card:hover {
-            transform: scale(1.08) translateY(-8px);
-            background: rgba(135, 206, 235, 0.25);
+            transform: translateY(-6px);
             box-shadow: 
-                0 20px 40px rgba(70, 130, 180, 0.4),
-                0 0 30px rgba(135, 206, 235, 0.3);
-            border-color: transparent;
+                12px 12px 24px var(--neu-shadow-dark),
+                -12px -12px 24px var(--neu-shadow-light),
+                inset 2px 2px 4px rgba(255, 255, 255, 0.1),
+                inset -2px -2px 4px rgba(184, 212, 240, 0.1);
         }
 
         .document-card:hover::before {
@@ -270,7 +283,10 @@
         }
 
         .document-card:active {
-            transform: scale(1.02) translateY(-3px);
+            transform: translateY(-2px);
+            box-shadow: 
+                inset 6px 6px 12px var(--neu-shadow-dark),
+                inset -6px -6px 12px var(--neu-shadow-light);
         }
 
         /* Click ripple effect for dashboard cards */
@@ -359,12 +375,11 @@
         }
 
         .upload-zone {
-            border: 2px dashed var(--accent-blue);
-            border-radius: 12px;
+            border: none;
+            border-radius: 20px;
             padding: 30px;
             text-align: center;
-            background: var(--glass-bg);
-            backdrop-filter: blur(8px);
+            background: var(--neu-surface);
             transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             position: relative;
             overflow: hidden;
@@ -372,6 +387,11 @@
             opacity: 0;
             transform: translateY(30px) scale(0.95);
             animation: uploadZoneEntry 0.6s ease-out forwards;
+            box-shadow: 
+                inset 4px 4px 8px var(--neu-shadow-dark),
+                inset -4px -4px 8px var(--neu-shadow-light),
+                4px 4px 8px var(--neu-shadow-dark),
+                -4px -4px 8px var(--neu-shadow-light);
         }
 
         .upload-zone:nth-child(1) { animation-delay: 0.1s; }
@@ -444,12 +464,12 @@
         }
 
         .upload-zone:hover {
-            border-color: transparent;
-            background: rgba(135, 206, 235, 0.2);
-            transform: translateY(-8px) scale(1.02);
+            transform: translateY(-4px) scale(1.02);
             box-shadow: 
-                0 15px 35px rgba(70, 130, 180, 0.3),
-                0 0 25px rgba(135, 206, 235, 0.4);
+                inset 6px 6px 12px var(--neu-shadow-dark),
+                inset -6px -6px 12px var(--neu-shadow-light),
+                8px 8px 16px var(--neu-shadow-dark),
+                -8px -8px 16px var(--neu-shadow-light);
         }
 
         .upload-zone:hover::before {
@@ -462,7 +482,10 @@
         }
 
         .upload-zone:active {
-            transform: translateY(-5px) scale(0.98);
+            transform: translateY(-2px) scale(0.98);
+            box-shadow: 
+                inset 8px 8px 16px var(--neu-shadow-dark),
+                inset -8px -8px 16px var(--neu-shadow-light);
         }
 
         .upload-zone i {
@@ -533,29 +556,36 @@
         }
 
         .modal-content {
-            background: var(--glass-bg);
-            backdrop-filter: blur(15px);
-            border: 1px solid var(--glass-border);
-            border-radius: 15px;
+            background: var(--neu-surface);
+            border: none;
+            border-radius: 20px;
+            box-shadow: 
+                12px 12px 24px var(--neu-shadow-dark),
+                -12px -12px 24px var(--neu-shadow-light);
         }
 
         .modal-header {
-            border-bottom: 1px solid var(--glass-border);
+            border-bottom: 1px solid rgba(184, 212, 240, 0.3);
+            background: linear-gradient(145deg, 
+                rgba(255, 255, 255, 0.1), 
+                rgba(184, 212, 240, 0.05));
+            border-radius: 20px 20px 0 0;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--secondary-blue) 100%);
+            background: var(--neu-surface);
             border: none;
-            border-radius: 12px;
+            border-radius: 15px;
             font-weight: 600;
             font-size: 16px;
             padding: 14px 24px;
             position: relative;
             overflow: hidden;
             transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            color: var(--primary-blue);
             box-shadow: 
-                0 4px 15px rgba(70, 130, 180, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+                6px 6px 12px var(--neu-shadow-dark),
+                -6px -6px 12px var(--neu-shadow-light);
         }
 
         .btn-primary::before {
@@ -570,12 +600,11 @@
         }
 
         .btn-primary:hover {
-            background: linear-gradient(135deg, var(--secondary-blue) 0%, var(--primary-blue) 100%);
-            transform: translateY(-3px) scale(1.02);
+            transform: translateY(-2px);
             box-shadow: 
-                0 8px 25px rgba(70, 130, 180, 0.6),
-                0 0 30px rgba(135, 206, 235, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+                8px 8px 16px var(--neu-shadow-dark),
+                -8px -8px 16px var(--neu-shadow-light);
+            color: var(--secondary-blue);
         }
 
         .btn-primary:hover::before {
@@ -583,76 +612,117 @@
         }
 
         .btn-primary:active {
-            transform: translateY(-1px) scale(0.98);
+            transform: translateY(0);
+            box-shadow: 
+                inset 4px 4px 8px var(--neu-shadow-dark),
+                inset -4px -4px 8px var(--neu-shadow-light);
             transition: all 0.1s ease;
         }
 
         .btn-primary:focus {
             box-shadow: 
-                0 0 0 0.3rem rgba(70, 130, 180, 0.25),
-                0 4px 15px rgba(70, 130, 180, 0.4);
+                0 0 0 3px rgba(74, 144, 226, 0.3),
+                6px 6px 12px var(--neu-shadow-dark),
+                -6px -6px 12px var(--neu-shadow-light);
         }
 
         .year-selector {
-            background: var(--glass-bg);
-            backdrop-filter: blur(8px);
-            border: 1px solid var(--glass-border);
-            border-radius: 10px;
-            color: var(--accent-blue);
+            background: var(--neu-surface);
+            border: none;
+            border-radius: 15px;
+            color: var(--neu-text);
+            box-shadow: 
+                inset 4px 4px 8px var(--neu-shadow-dark),
+                inset -4px -4px 8px var(--neu-shadow-light);
+            transition: all 0.3s ease;
+        }
+
+        .year-selector:focus {
+            box-shadow: 
+                inset 6px 6px 12px var(--neu-shadow-dark),
+                inset -6px -6px 12px var(--neu-shadow-light),
+                0 0 0 3px rgba(74, 144, 226, 0.2);
+            color: var(--primary-blue);
         }
 
         .document-item {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 8px;
-            padding: 10px;
-            margin-bottom: 10px;
+            background: var(--neu-surface);
+            border: none;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 
+                4px 4px 8px var(--neu-shadow-dark),
+                -4px -4px 8px var(--neu-shadow-light);
+            transition: all 0.3s ease;
+        }
+
+        .document-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                6px 6px 12px var(--neu-shadow-dark),
+                -6px -6px 12px var(--neu-shadow-light);
         }
 
         .view-btn, .download-btn, .delete-btn {
-            color: white;
+            background: var(--neu-surface);
             border: none;
-            border-radius: 5px;
+            border-radius: 10px;
             padding: 8px 12px;
             cursor: pointer;
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
             font-size: 14px;
+            box-shadow: 
+                3px 3px 6px var(--neu-shadow-dark),
+                -3px -3px 6px var(--neu-shadow-light);
         }
 
         .view-btn {
-            background: var(--accent-blue);
+            color: var(--primary-blue);
         }
 
         .download-btn {
-            background: #28a745;
+            color: #28a745;
         }
 
         .delete-btn {
-            background: #dc3545;
+            color: #dc3545;
         }
 
         .view-btn:hover {
-            background: var(--secondary-blue);
-            transform: scale(1.1);
+            transform: translateY(-2px);
+            box-shadow: 
+                4px 4px 8px var(--neu-shadow-dark),
+                -4px -4px 8px var(--neu-shadow-light);
+            color: var(--secondary-blue);
         }
 
         .download-btn:hover {
-            background: #218838;
-            transform: scale(1.1);
+            transform: translateY(-2px);
+            box-shadow: 
+                4px 4px 8px var(--neu-shadow-dark),
+                -4px -4px 8px var(--neu-shadow-light);
+            color: #218838;
         }
 
         .delete-btn:hover {
-            background: #c82333;
-            transform: scale(1.1);
+            transform: translateY(-2px);
+            box-shadow: 
+                4px 4px 8px var(--neu-shadow-dark),
+                -4px -4px 8px var(--neu-shadow-light);
+            color: #c82333;
         }
 
         .view-btn:active, .download-btn:active, .delete-btn:active {
-            transform: scale(0.95);
+            transform: translateY(0);
+            box-shadow: 
+                inset 2px 2px 4px var(--neu-shadow-dark),
+                inset -2px -2px 4px var(--neu-shadow-light);
         }
 
         .view-btn i, .download-btn i, .delete-btn i {
@@ -844,29 +914,33 @@
         }
 
         #loginScreen .form-control {
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(135, 206, 235, 0.3);
-            border-radius: 12px;
+            background: var(--neu-surface);
+            border: none;
+            border-radius: 15px;
             padding: 12px 16px;
             font-size: 16px;
             transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             position: relative;
+            color: var(--neu-text);
+            box-shadow: 
+                inset 4px 4px 8px var(--neu-shadow-dark),
+                inset -4px -4px 8px var(--neu-shadow-light);
         }
 
         #loginScreen .form-control:focus {
-            border-color: var(--accent-blue);
             box-shadow: 
-                0 0 0 0.3rem rgba(70, 130, 180, 0.25),
-                0 0 20px rgba(135, 206, 235, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateY(-2px);
+                inset 6px 6px 12px var(--neu-shadow-dark),
+                inset -6px -6px 12px var(--neu-shadow-light),
+                0 0 0 3px rgba(74, 144, 226, 0.2);
+            color: var(--primary-blue);
+            transform: translateY(-1px);
         }
 
         #loginScreen .form-control:hover {
-            border-color: rgba(135, 206, 235, 0.5);
-            background: rgba(255, 255, 255, 0.12);
             transform: translateY(-1px);
+            box-shadow: 
+                inset 5px 5px 10px var(--neu-shadow-dark),
+                inset -5px -5px 10px var(--neu-shadow-light);
         }
 
         #loginScreen .form-control::placeholder {
@@ -886,6 +960,7 @@
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
+            color: var(--neu-text);
         }
 
         #loginScreen .form-label i {
@@ -1301,7 +1376,7 @@
                             <div class="security-pulse-2"></div>
                         </div>
                         <h2 class="animated-title" style="color: var(--accent-blue);">Sistem Keselamatan</h2>
-                        <img src="img/logo.png" alt="Logo UiTM Penerbit" style="height: 40px;">
+                        <img src="img/logo.png" alt="Logo UiTM Penerbit" style="height: 60px;">
                     </div>
                     
                     <form id="loginForm" onsubmit="handleLogin(event)">
@@ -1363,7 +1438,7 @@
                         </button>
                     </div>
                     <h1 class="text-center mb-4 animated-title" style="color: var(--accent-blue);">
-                        <i class="fas fa-file-pdf me-3 title-icon"></i>Sistem Fail (Dokumen PDF)
+                        <i class="fas fa-file-pdf me-3 title-icon"></i>Sistem Simpan Dokumen PDF
                     </h1>
                     
                     <!-- Year Selector -->
@@ -1554,7 +1629,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Google Apps Script Web App URL - GANTI DENGAN URL ANDA
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwDDOqk9BA6UhcSW_2Aj15KA4WYa-sj-ZBRu0iMIr_1w6BqJC9bXu9zRMVxPJ5tSl-Ciw/exec';
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyzw2AAmA3W0B6nnB28afNf8M_d-sLEcotKiL6WhQXQ4sGtrByFwCaBd5TIn_Xxlv4HUA/exec';
         
         // Initialize storage and year selector
         let documentStorage = {};
@@ -2136,19 +2211,19 @@
                 <div class="employee-avatar">
                     <i class="fas fa-user"></i>
                 </div>
-                <div class="employee-name">MOHAMMAD AIMAN SYAZWEE</div>
+                <div class="employee-name">Mohammad Aiman Syazwee Bin Robaee</div>
                 <div class="employee-details">
                     <div class="employee-detail-item">
                         <i class="fas fa-id-badge"></i>
-                        <span><strong>NO. PEKERJA:</strong> 352169</span>
+                        <span><strong>No. Pekerja:</strong> 352169</span>
                     </div>
                     <div class="employee-detail-item">
                         <i class="fas fa-briefcase"></i>
-                        <span><strong>JAWATAN:</strong> KERANI</span>
+                        <span><strong>Jawatan:</strong> Kerani</span>
                     </div>
                     <div class="employee-detail-item">
                         <i class="fas fa-building"></i>
-                        <span><strong>JABATAN:</strong> PENERBIT</span>
+                        <span><strong>Jabatan:</strong> Penerbit</span>
                     </div>
                 </div>
                 <div class="welcome-message">
@@ -2217,6 +2292,8 @@
     </script>
 </body>
 </html>
+
+
 
 
 
